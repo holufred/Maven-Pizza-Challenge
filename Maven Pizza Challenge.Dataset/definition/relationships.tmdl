@@ -1,0 +1,20 @@
+relationship 278ac217-59f8-4c4d-80a9-256b84530531
+	fromColumn: orders.size
+	toColumn: DimSize.Size
+
+relationship 7284b640-86b7-4260-84f8-f1c7833e246a
+	fromColumn: orders.name
+	toColumn: DimName.Name
+
+relationship d244b2ef-7642-4df4-93e4-32fcb48cbce5
+	fromColumn: orders.category
+	toColumn: DimCategory.Category
+
+relationship 5beb0054-9bfe-44f3-bfd3-423f4b83e825
+	fromColumn: orders.date
+	toColumn: Date.Date
+
+relationship abc19ff1-268e-4e46-83b8-36896046332a
+	fromColumn: orders.time
+	toColumn: Time.Time
+

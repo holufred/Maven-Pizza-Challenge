@@ -1,0 +1,189 @@
+table _Measures
+	lineageTag: 7a829cf2-2e02-433d-a89e-1828c77ac4aa
+
+	measure 'Number of Orders' = CALCULATE ( DISTINCTCOUNT ( orders[order_id] ) )
+		formatString: #,0
+		lineageTag: d8277026-ef1a-463e-9031-662676114e79
+
+	measure 'Total Quantity per Hour' = SUMX ( RELATEDTABLE ( orders ), orders[quantity] )
+		lineageTag: d2ff4e4f-9cf8-4030-8fc8-4bd08d547141
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Average Order Value' =
+			AVERAGEX (
+			    VALUES ( orders[order_id] ),
+			    CALCULATE ( SUM ( orders[order_value] ) )
+			)
+		lineageTag: c6cf63fb-2709-462d-8422-260dac92b181
+
+		formatStringDefinition = ```
+				"£0.00" 
+				```
+
+	measure 'Average Number of Orders Per Day' = AVERAGEX ( VALUES ( 'Date'[Date] ), [Number of Orders] )
+		lineageTag: c3a3d3f2-03ab-4d1c-bb81-6e9adce37ec5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Revenue' = CALCULATE ( SUM ( orders[order_value] ) )
+		lineageTag: a872da32-cb65-434b-b043-1ecd1ede36f3
+
+		formatStringDefinition = "£" & "#,0.0"
+
+	measure 'Best Sellers' =
+			VAR SelectedSlicer = 'TopN'[TopN Value]
+			RETURN
+			    CALCULATE (
+			        [Number of Pizza Ordered],
+			        KEEPFILTERS (
+			            TOPN (
+			                SelectedSlicer,
+			                ALLSELECTED ( DimName[Name] ),
+			                CALCULATE ( [Number of Pizza Ordered], ALL ( DimSize ) ), DESC
+			            )
+			        )
+			    )
+		formatString: 0
+		lineageTag: b9f46e05-b219-4270-9c59-d7d3739b1641
+
+	measure 'Number of Pizza Ordered' = CALCULATE ( COUNT ( orders[name] ) )
+		formatString: #,0
+		lineageTag: cc8bd714-9675-4ad3-bcd4-5ea8853fb00e
+
+	measure 'Worst Sellers' =
+			VAR SelectedSlicer = 'TopN'[TopN Value]
+			RETURN
+			    CALCULATE (
+			        [Number of Pizza Ordered],
+			        KEEPFILTERS (
+			            TOPN (
+			                SelectedSlicer,
+			                ALLSELECTED ( DimName[Name] ),
+			                CALCULATE ( [Number of Pizza Ordered], ALL ( DimSize ) ), ASC
+			            )
+			        )
+			    )
+		formatString: 0
+		lineageTag: 6724e567-271f-4396-86d0-ee3898fb455d
+
+	measure 'Average Quantity per Date' = AVERAGEX ( VALUES ( 'Date'[Date] ), CALCULATE ( [Total Quantity per Hour] ) )
+		lineageTag: c99da975-ae5a-48c2-87c2-93cffc58e48e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Orders Current Quarter' = CALCULATE ( [Number of Orders], DATESQTD ( 'Date'[Date] ) )
+		formatString: #,0
+		lineageTag: 8aa112d6-dd0a-4aef-8f7a-7395af4ff1c4
+
+	measure 'Total Orders Previous Quarter' =
+			CALCULATE (
+			    [Total Orders Current Quarter],
+			    DATEADD ( 'Date'[Date], -1, QUARTER )
+			)
+		formatString: #,0
+		lineageTag: b311be5f-5880-4af7-9102-33facff7c92c
+
+	measure 'Percentage Difference (Orders)' =
+			VAR up_arrow =
+			    UNICHAR ( 129137 )
+			VAR down_arrow =
+			    UNICHAR ( 129139 )
+			VAR _current = [Number of Orders]
+			VAR _previous = [Number of Orders Previous Month]
+			VAR _growth =
+			    DIVIDE ( _current - _previous, _previous, 0 )
+			RETURN
+			    IF (
+			        _growth < 0,
+			        down_arrow & " "
+			            & FORMAT ( _growth, "0.00%" ),
+			        up_arrow & " "
+			            & FORMAT ( _growth, "0.00%" )
+			    )
+		lineageTag: dbdcb5f4-f3ea-4efc-86ce-7dd144743268
+
+	measure 'Total Revenue Previous Month' = CALCULATE ( [Total Revenue], DATEADD ( 'Date'[Date], -1, MONTH ) )
+		lineageTag: bb5ac665-d569-4fd7-be5a-637fc9b3fed7
+
+		formatStringDefinition = "£" & "#,0.0"
+
+	measure 'Revenue Label' =
+			IF (
+			    [Total Revenue] > [Total Revenue Previous Month],
+			    [Total Revenue],
+			    [Total Revenue Previous Month]
+			)
+		lineageTag: ae2e4c1c-90ee-4d5a-9e1f-8853cfbadcb9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue Color' = IF ( [Total Revenue] > [Total Revenue Previous Month], "Green", "Red" )
+		lineageTag: 9eeced7f-aac9-450c-a9d2-60c9f9d38d04
+
+	measure 'Revenue Red Max' = IF ( [Total Revenue] < [Total Revenue Previous Month], [Revenue Label] )
+		lineageTag: 59ae79aa-dff6-4f04-928e-300ea6d2fe57
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue Green Max' = IF ( [Total Revenue] > [Total Revenue Previous Month], [Revenue Label] )
+		lineageTag: 83c4e115-c144-46f5-93b2-1a57a24ff112
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Percentage Difference (Revenue)' =
+			VAR up_arrow =
+			    UNICHAR ( 129137 )
+			VAR down_arrow =
+			    UNICHAR ( 129139 )
+			VAR _current = [Total Revenue]
+			VAR _previous = [Total Revenue Previous Month]
+			VAR _growth =
+			    DIVIDE ( _current - _previous, _previous, 0 )
+			RETURN
+			    IF (
+			        _growth < 0,
+			        down_arrow & " "
+			            & FORMAT ( _growth, "0.00%" ),
+			        up_arrow & " "
+			            & FORMAT ( _growth, "0.00%" )
+			    )
+		lineageTag: 285fee43-c7af-47fd-b264-afb6c29ed6f1
+
+	measure 'QTD Revenue' = CALCULATE ( [Total Revenue], DATESQTD ( 'Date'[Date] ) )
+		lineageTag: a673cad5-8da8-47d3-8f8c-4a6611018eb9
+
+		formatStringDefinition = "£" & "#,0.0"
+
+	measure 'YTD Revenue' = CALCULATE ( [Total Revenue], DATESYTD ( 'Date'[Date] ) )
+		lineageTag: 0d1ba71b-97b3-43a0-b516-5e38fb49630f
+
+		formatStringDefinition = "£" & "#,0.0"
+
+	measure 'Number of Orders Previous Month' = CALCULATE ( [Number of Orders], DATEADD ( 'Date'[Date], -1, MONTH ) )
+		formatString: #,0
+		lineageTag: 11ec9d98-3537-47b8-b63a-4a1a1160a49f
+
+	measure 'YTD Orders' = CALCULATE ( [Number of Orders], DATESYTD ( 'Date'[Date] ) )
+		formatString: #,0
+		lineageTag: 5859a009-f8e8-43e6-aac3-52535049a301
+
+	measure 'QTD Orders' = CALCULATE ( [Number of Orders], DATESQTD ( 'Date'[Date] ) )
+		formatString: #,0
+		lineageTag: ca43653d-7a24-46b7-82e7-f90a0b326f48
+
+	measure 'Order Color' = IF ( [Number of Orders] > [Number of Orders Previous Month], "Green", "Red" )
+		lineageTag: 72a4c8c4-e571-4c3e-b02b-fba5db104a61
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

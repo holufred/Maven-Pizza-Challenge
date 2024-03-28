@@ -1,0 +1,114 @@
+table Date
+	lineageTag: 76759749-6bb5-4497-9026-dea3612525e6
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		lineageTag: 2a15be0f-d880-4657-8d86-f8b9f307e7ee
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 4eae77fe-839b-4bf0-a9f8-a9cfa5cce588
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: 58407843-733b-4c7d-b961-a174bbd3650e
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: c89f604b-200c-48d6-a8e2-5e6c61d97546
+		summarizeBy: none
+		sourceColumn: Month Name
+		sortByColumn: Month
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: c790b4e5-236c-427b-9b23-010752c7d01a
+		summarizeBy: none
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day Name'
+		dataType: string
+		lineageTag: 79d00225-7a1c-4fe5-8502-cdfcecd588e6
+		summarizeBy: none
+		sourceColumn: Day Name
+		sortByColumn: 'Day of Week'
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 555affbb-fe0e-4e4c-9ea8-9592ff5d494d
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Week'
+		dataType: int64
+		formatString: 0
+		lineageTag: 5446b424-7ee1-47cc-b8a6-c9b2663c3f91
+		summarizeBy: none
+		sourceColumn: Day of Week
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Weekend Flag'
+		dataType: string
+		lineageTag: eab5fdbb-36fc-4a67-9122-cb02c24684d2
+		summarizeBy: none
+		sourceColumn: Weekend Flag
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Source = List.Min(#"orders"[date]),
+				    Custom1 = List.Dates (Source, Number.From(List.Max(#"orders"[date]))+ 1 - Number.From(Source), #duration(1,0,0,0)),
+				    #"Converted to Table" = Table.FromList(Custom1, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    #"Renamed Columns" = Table.RenameColumns(#"Converted to Table",{{"Column1", "Date"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"Date", type date}}),
+				    #"Inserted Year" = Table.AddColumn(#"Changed Type", "Year", each Date.Year([Date]), Int64.Type),
+				    #"Inserted Month" = Table.AddColumn(#"Inserted Year", "Month", each Date.Month([Date]), Int64.Type),
+				    #"Inserted Month Name" = Table.AddColumn(#"Inserted Month", "Month Name", each Date.MonthName([Date]), type text),
+				    #"Inserted Day" = Table.AddColumn(#"Inserted Month Name", "Day", each Date.Day([Date]), Int64.Type),
+				    #"Inserted Day Name" = Table.AddColumn(#"Inserted Day", "Day Name", each Date.DayOfWeekName([Date]), type text),
+				    #"Inserted Quarter" = Table.AddColumn(#"Inserted Day Name", "Quarter", each "Q" &  Text.From(Date.QuarterOfYear([Date])) & "-" & Text.From(Date.Year([Date])), type text),
+				    #"Inserted Day of Week" = Table.AddColumn(#"Inserted Quarter", "Day of Week", each Date.DayOfWeek([Date],1), Int64.Type),
+				    #"Added Conditional Column" = Table.AddColumn(#"Inserted Day of Week", "Weekend Flag", each if [Day Name] = "Saturday" then "Weekend" else if [Day Name] = "Sunday" then "Weekend" else "Weekday", type text)
+				in
+				    #"Added Conditional Column"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

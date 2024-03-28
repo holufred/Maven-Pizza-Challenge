@@ -1,0 +1,40 @@
+table DimSize
+	lineageTag: 5ec0919d-3a27-4c66-b908-3717b623db3f
+
+	column Size
+		dataType: string
+		lineageTag: a7e2b84f-4d53-4c90-a868-927936869fa0
+		summarizeBy: none
+		sourceColumn: Size
+		sortByColumn: Numbering
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column Numbering
+		dataType: int64
+		formatString: 0
+		lineageTag: fe172dd2-3b08-4396-a54d-593a60e48ffd
+		summarizeBy: none
+		sourceColumn: Numbering
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimSize = m
+		mode: import
+		source =
+				let
+				    Source = orders,
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"size"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Duplicates",{{"size", "Size"}}),
+				    #"Added Conditional Column" = Table.AddColumn(#"Renamed Columns", "Numbering", each if [Size] = "M" then 1 else if [Size] = "S" then 0 else if [Size] = "L" then 2 else if [Size] = "XL" then 3 else if [Size] = "XXL" then 4 else null, type number),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Added Conditional Column",{{"Numbering", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

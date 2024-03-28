@@ -1,0 +1,26 @@
+table DimCategory
+	lineageTag: c16466fa-2089-4002-9646-a05fd739f222
+
+	column Category
+		dataType: string
+		lineageTag: 4a7d2cda-aa03-4309-b111-619fd35599e3
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimCategory = m
+		mode: import
+		source =
+				let
+				    Source = orders,
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"category"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Other Columns",{{"category", "Category"}}),
+				    #"Removed Duplicates" = Table.Distinct(#"Renamed Columns")
+				in
+				    #"Removed Duplicates"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

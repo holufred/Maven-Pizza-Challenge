@@ -1,0 +1,162 @@
+Average Number of Orders Per Day:
+AVERAGEX ( VALUES ( 'Date'[Date] ), [Number of Orders] )
+
+
+Average Order Value:
+AVERAGEX (
+    VALUES ( orders[order_id] ),
+    CALCULATE ( SUM ( orders[order_value] ) )
+)
+
+
+Average Quantity per Date:
+AVERAGEX ( VALUES ( 'Date'[Date] ), CALCULATE ( [Total Quantity per Hour] ) )
+
+
+Best Sellers:
+VAR SelectedSlicer = 'TopN'[TopN Value]
+RETURN
+    CALCULATE (
+        [Number of Pizza Ordered],
+        KEEPFILTERS (
+            TOPN (
+                SelectedSlicer,
+                ALLSELECTED ( DimName[Name] ),
+                CALCULATE ( [Number of Pizza Ordered], ALL ( DimSize ) ), DESC
+            )
+        )
+    )
+
+
+Number of Orders:
+CALCULATE ( DISTINCTCOUNT ( orders[order_id] ) )
+
+
+Number of Orders Previous Month:
+CALCULATE ( [Number of Orders], DATEADD ( 'Date'[Date], -1, MONTH ) )
+
+
+Number of Pizza Ordered:
+CALCULATE ( COUNT ( orders[name] ) )
+
+
+Order Color:
+IF ( [Number of Orders] > [Number of Orders Previous Month], "Green", "Red" )
+
+
+Percentage Difference (Orders):
+VAR up_arrow =
+    UNICHAR ( 129137 )
+VAR down_arrow =
+    UNICHAR ( 129139 )
+VAR _current = [Number of Orders]
+VAR _previous = [Number of Orders Previous Month]
+VAR _growth =
+    DIVIDE ( _current - _previous, _previous, 0 )
+RETURN
+    IF (
+        _growth < 0,
+        down_arrow & " "
+            & FORMAT ( _growth, "0.00%" ),
+        up_arrow & " "
+            & FORMAT ( _growth, "0.00%" )
+    )
+
+
+Percentage Difference (Revenue):
+VAR up_arrow =
+    UNICHAR ( 129137 )
+VAR down_arrow =
+    UNICHAR ( 129139 )
+VAR _current = [Total Revenue]
+VAR _previous = [Total Revenue Previous Month]
+VAR _growth =
+    DIVIDE ( _current - _previous, _previous, 0 )
+RETURN
+    IF (
+        _growth < 0,
+        down_arrow & " "
+            & FORMAT ( _growth, "0.00%" ),
+        up_arrow & " "
+            & FORMAT ( _growth, "0.00%" )
+    )
+
+
+QTD Orders:
+CALCULATE ( [Number of Orders], DATESQTD ( 'Date'[Date] ) )
+
+
+QTD Revenue:
+CALCULATE ( [Total Revenue], DATESQTD ( 'Date'[Date] ) )
+
+
+Revenue Color:
+IF ( [Total Revenue] > [Total Revenue Previous Month], "Green", "Red" )
+
+
+Revenue Green Max:
+IF ( [Total Revenue] > [Total Revenue Previous Month], [Revenue Label] )
+
+
+Revenue Label:
+IF (
+    [Total Revenue] > [Total Revenue Previous Month],
+    [Total Revenue],
+    [Total Revenue Previous Month]
+)
+
+
+Revenue Red Max:
+IF ( [Total Revenue] < [Total Revenue Previous Month], [Revenue Label] )
+
+
+TopN Value:
+SELECTEDVALUE ( 'TopN'[TopN], 5 )
+
+
+Total Orders Current Quarter:
+CALCULATE ( [Number of Orders], DATESQTD ( 'Date'[Date] ) )
+
+
+Total Orders Previous Quarter:
+CALCULATE (
+    [Total Orders Current Quarter],
+    DATEADD ( 'Date'[Date], -1, QUARTER )
+)
+
+
+Total Quantity per Hour:
+SUMX ( RELATEDTABLE ( orders ), orders[quantity] )
+
+
+Total Revenue:
+CALCULATE ( SUM ( orders[order_value] ) )
+
+
+Total Revenue Previous Month:
+CALCULATE ( [Total Revenue], DATEADD ( 'Date'[Date], -1, MONTH ) )
+
+
+Worst Sellers:
+VAR SelectedSlicer = 'TopN'[TopN Value]
+RETURN
+    CALCULATE (
+        [Number of Pizza Ordered],
+        KEEPFILTERS (
+            TOPN (
+                SelectedSlicer,
+                ALLSELECTED ( DimName[Name] ),
+                CALCULATE ( [Number of Pizza Ordered], ALL ( DimSize ) ), ASC
+            )
+        )
+    )
+
+
+YTD Orders:
+CALCULATE ( [Number of Orders], DATESYTD ( 'Date'[Date] ) )
+
+
+YTD Revenue:
+CALCULATE ( [Total Revenue], DATESYTD ( 'Date'[Date] ) )
+
+

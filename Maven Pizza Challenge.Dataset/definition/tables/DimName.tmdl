@@ -1,0 +1,26 @@
+table DimName
+	lineageTag: feb2dec3-a44c-49de-b639-9c297098fdec
+
+	column Name
+		dataType: string
+		lineageTag: b7d3f834-6e35-4f66-87bd-4e6075d19af1
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition DimName = m
+		mode: import
+		source =
+				let
+				    Source = orders,
+				    #"Removed Other Columns" = Table.SelectColumns(Source,{"name"}),
+				    #"Removed Duplicates" = Table.Distinct(#"Removed Other Columns"),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Duplicates",{{"name", "Name"}})
+				in
+				    #"Renamed Columns"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

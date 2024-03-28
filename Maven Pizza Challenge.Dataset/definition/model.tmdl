@@ -1,0 +1,28 @@
+model Model
+	culture: en-GB
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBIDesktopVersion = 2.127.1080.0 (24.03)
+
+annotation PBI_QueryOrder = ["order_details","orders","pizza_types","pizzas","DimSize","DimName","DimCategory","Date","Time","_Measures"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+annotation __TEdtr = 1
+
+ref table orders
+ref table DimSize
+ref table DimName
+ref table DimCategory
+ref table Date
+ref table Time
+ref table _Measures
+ref table TopN
+

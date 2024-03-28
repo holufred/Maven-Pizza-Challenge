@@ -1,0 +1,131 @@
+table orders
+	lineageTag: 0eccdfb1-3bc7-46a0-b718-46f4c5e260bd
+
+	column order_id
+		dataType: int64
+		formatString: 0
+		lineageTag: bddf9f61-4284-439b-89ff-ba1fc932cb7e
+		summarizeBy: sum
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2ddce7a9-4390-4358-9b44-f18cf0f3cf78
+		summarizeBy: none
+		sourceColumn: date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column time
+		dataType: dateTime
+		formatString: Long Time
+		lineageTag: fd3b2eb1-7cbf-432f-af39-525b7bcc7bf0
+		summarizeBy: none
+		sourceColumn: time
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: 2c434b62-2165-48bd-aa14-8677475eb5c3
+		summarizeBy: sum
+		sourceColumn: quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column size
+		dataType: string
+		lineageTag: c81d9c8d-961f-4353-a835-0648207af62c
+		summarizeBy: none
+		sourceColumn: size
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column price
+		dataType: double
+		lineageTag: 02a0f043-b5c3-4a41-b6a6-7286e032978e
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column name
+		dataType: string
+		lineageTag: 21ad2838-f986-4f0d-923a-0311e83db436
+		summarizeBy: none
+		sourceColumn: name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		isHidden
+		lineageTag: bf818d94-5b95-42e3-984f-e40af0f93ff6
+		summarizeBy: none
+		sourceColumn: category
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ingredients
+		dataType: string
+		lineageTag: 4d7ecdd8-d069-4862-be96-7b855f1ebfd3
+		summarizeBy: none
+		sourceColumn: ingredients
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_value
+		dataType: double
+		lineageTag: 5a81e112-76a4-4faa-bf1e-3f395e55deba
+		summarizeBy: sum
+		sourceColumn: order_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition orders = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("G:\My Drive\Power BI Projects\Maven Pizza Challenge\Data\pizza_sales\orders.csv"),[Delimiter=",", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_id", Int64.Type}, {"date", type date}, {"time", type text}}),
+				    #"Merged Queries" = Table.NestedJoin(#"Changed Type", {"order_id"}, order_details, {"order_id"}, "order_details", JoinKind.LeftOuter),
+				    #"Expanded order_details" = Table.ExpandTableColumn(#"Merged Queries", "order_details", {"pizza_id", "quantity"}, {"pizza_id", "quantity"}),
+				    #"Merged Queries1" = Table.NestedJoin(#"Expanded order_details", {"pizza_id"}, pizzas, {"pizza_id"}, "pizzas", JoinKind.LeftOuter),
+				    #"Expanded pizzas" = Table.ExpandTableColumn(#"Merged Queries1", "pizzas", {"pizza_type_id", "size", "price"}, {"pizza_type_id", "size", "price"}),
+				    #"Merged Queries2" = Table.NestedJoin(#"Expanded pizzas", {"pizza_type_id"}, pizza_types, {"pizza_type_id"}, "pizza_types", JoinKind.LeftOuter),
+				    #"Expanded pizza_types" = Table.ExpandTableColumn(#"Merged Queries2", "pizza_types", {"name", "category", "ingredients"}, {"name", "category", "ingredients"}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Expanded pizza_types",{"pizza_id", "pizza_type_id"}),
+				    #"Removed the second component of the time column" = Table.TransformColumns(#"Removed Columns", {{"time", each Text.BeforeDelimiter(_, ":", 1), type text}}),
+				    #"Change the time column to type time" = Table.TransformColumnTypes(#"Removed the second component of the time column",{{"time", type time}}),
+				    #"Added Custom" = Table.AddColumn(#"Change the time column to type time", "order_value", each [quantity]*[price]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"order_value", type number}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

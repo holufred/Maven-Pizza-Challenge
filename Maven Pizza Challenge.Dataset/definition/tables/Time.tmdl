@@ -1,0 +1,67 @@
+table Time
+	lineageTag: f33898b9-c347-4985-aba5-8950656a9254
+
+	column Seconds
+		dataType: int64
+		formatString: 0
+		lineageTag: 5812da35-55a2-48c3-ab3f-f9f7a826f241
+		summarizeBy: none
+		sourceColumn: Seconds
+
+		annotation SummarizationSetBy = Automatic
+
+	column Time
+		dataType: dateTime
+		formatString: hh:nn
+		lineageTag: 421a3c36-f2ca-4561-a8a6-b8f7818676a9
+		summarizeBy: none
+		sourceColumn: Time
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column '1 hour bucket'
+		dataType: int64
+		formatString: 0
+		lineageTag: 839fe2fd-74ac-48a4-b34e-1195cb33592e
+		summarizeBy: none
+		sourceColumn: 1 hour bucket
+
+		annotation SummarizationSetBy = Automatic
+
+	column '1 hour time slot'
+		dataType: dateTime
+		formatString: hh:nn
+		lineageTag: d74f4f3e-9b49-49d1-979b-daa7334069b6
+		summarizeBy: none
+		sourceColumn: 1 hour time slot
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	partition Time = m
+		mode: import
+		source =
+				let
+				    Source = {0..1439},
+				    #"Converted to Table" = Table.FromList(Source, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+				    #"Changed Type2" = Table.TransformColumnTypes(#"Converted to Table",{{"Column1", Int64.Type}}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Changed Type2",{{"Column1", "Seconds"}}),
+				    #"Inserted Division" = Table.AddColumn(#"Renamed Columns", "Time", each [Seconds] / 1440, type number),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Inserted Division",{{"Time", type time}}),
+				    #"Inserted Integer-Division" = Table.AddColumn(#"Changed Type", "1 hour bucket", each Number.IntegerDivide([Seconds], 60), Int64.Type),
+				    #"Added Custom" = Table.AddColumn(#"Inserted Integer-Division", "1 hour time slot", each [#"1 hour bucket"]*60/1440),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Added Custom",{{"1 hour time slot", type time}})
+				in
+				    #"Changed Type1"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,40 @@
+expression order_details =
+		let
+		    Source = Csv.Document(File.Contents("G:\My Drive\Power BI Projects\Maven Pizza Challenge\Data\pizza_sales\order_details.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"order_details_id", Int64.Type}, {"order_id", Int64.Type}, {"pizza_id", type text}, {"quantity", Int64.Type}})
+		in
+		    #"Changed Type"
+	lineageTag: a07d1eab-ddb2-4e7d-94e2-926192a1447a
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression pizza_types =
+		let
+		    Source = Csv.Document(File.Contents("G:\My Drive\Power BI Projects\Maven Pizza Challenge\Data\pizza_sales\pizza_types.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}}),
+		    #"Promoted Headers" = Table.PromoteHeaders(#"Changed Type", [PromoteAllScalars=true]),
+		    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers",{{"pizza_type_id", type text}, {"name", type text}, {"category", type text}, {"ingredients", type text}})
+		in
+		    #"Changed Type1"
+	lineageTag: ef6cc960-4919-496c-a7a1-256270ec9f0c
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
+expression pizzas =
+		let
+		    Source = Csv.Document(File.Contents("G:\My Drive\Power BI Projects\Maven Pizza Challenge\Data\pizza_sales\pizzas.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+		    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"pizza_id", type text}, {"pizza_type_id", type text}, {"size", type text}, {"price", type number}})
+		in
+		    #"Changed Type"
+	lineageTag: 95931986-4d3f-4ea4-9cb1-6c47b8adfb8a
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

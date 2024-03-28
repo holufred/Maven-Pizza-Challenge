@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Maven Pizza Challenge"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "8ed6d3f4-b152-40d0-b988-e62f43457fae"
+  }
+}

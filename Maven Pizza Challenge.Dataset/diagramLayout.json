@@ -1,0 +1,126 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 0,
+            "y": 0
+          },
+          "nodeIndex": "Date",
+          "nodeLineageTag": "76759749-6bb5-4497-9026-dea3612525e6",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 436.95630283542829,
+            "y": 0
+          },
+          "nodeIndex": "DimCategory",
+          "nodeLineageTag": "c16466fa-2089-4002-9646-a05fd739f222",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 0,
+            "y": 595.97132727561916
+          },
+          "nodeIndex": "DimName",
+          "nodeLineageTag": "feb2dec3-a44c-49de-b639-9c297098fdec",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 540.59828637120279,
+            "y": 675.36931169256582
+          },
+          "nodeIndex": "DimSize",
+          "nodeLineageTag": "5ec0919d-3a27-4c66-b908-3717b623db3f",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 306.09344771242331,
+            "y": 293.69650974233127
+          },
+          "nodeIndex": "orders",
+          "nodeLineageTag": "0eccdfb1-3bc7-46a0-b718-46f4c5e260bd",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 958.5982863712029,
+            "y": 216.68465584628291
+          },
+          "nodeIndex": "Time",
+          "nodeLineageTag": "f33898b9-c347-4985-aba5-8950656a9254",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1271.5982863712029,
+            "y": 45.684655846282908
+          },
+          "nodeIndex": "_Measures",
+          "nodeLineageTag": "7a829cf2-2e02-433d-a89e-1828c77ac4aa",
+          "size": {
+            "height": 328,
+            "width": 339
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1271.5982863712029,
+            "y": 392.68465584628291
+          },
+          "nodeIndex": "TopN",
+          "nodeLineageTag": "275eb9f6-5881-4dd7-b330-c207ac5b53fa",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}
